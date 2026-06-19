@@ -1,0 +1,24 @@
+{
+  "name": "integrated-authentication-service",
+  "version": "1.0.0",
+  "description": "HTTP Basic Authentication demo in Node.js",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "basic-auth"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
+
