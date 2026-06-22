@@ -5,6 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "generate:cert": "sh ./scripts/generate-self-signed-cert.sh",
+    "trust:cert": "sh ./scripts/trust-cert-macos.sh",
     "test": "node --test"
   },
   "keywords": [

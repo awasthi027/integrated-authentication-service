@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Certificate Challenge Not Available</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #fef3c7, #fed7aa, #fca5a5);
+        color: #111827;
+      }
+      .card {
+        width: min(740px, 92%);
+        padding: 2rem;
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 12px 30px rgba(30, 41, 59, 0.2);
+        border: 3px solid #f97316;
+      }
+      h1 {
+        margin: 0 0 0.75rem;
+        font-size: 2rem;
+        font-weight: 800;
+        color: #d97706;
+      }
+      .warning {
+        display: inline-block;
+        margin: 0.25rem 0 1rem;
+        padding: 0.45rem 0.7rem;
+        border-radius: 8px;
+        background: #fed7aa;
+        color: #92400e;
+        font-weight: 700;
+      }
+      p {
+        margin: 0.75rem 0;
+        line-height: 1.6;
+      }
+      .reason {
+        background: #fef3c7;
+        padding: 1rem;
+        border-left: 4px solid #f59e0b;
+        border-radius: 6px;
+        margin: 1rem 0;
+      }
+      .reason strong {
+        color: #d97706;
+      }
+      .next-steps {
+        background: #ecfdf5;
+        padding: 1rem;
+        border-left: 4px solid #10b981;
+        border-radius: 6px;
+        margin: 1rem 0;
+      }
+      .next-steps strong {
+        color: #059669;
+      }
+      code {
+        background: #f3f4f6;
+        padding: 0.15rem 0.4rem;
+        border-radius: 4px;
+        font-family: monospace;
+        color: #4f46e5;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="card">
+      <h1>Certificate Challenge Not Available</h1>
+      <p class="warning">⚠️ Platform Limitation</p>
+
+      <div class="reason">
+        <strong>Why?</strong>
+        <p>Client certificate authentication requires direct TLS handshake between browser and this app. Your request came through a TLS-terminating proxy (e.g., Railway edge), which means the connection is encrypted at the proxy layer, not here.</p>
+      </div>
+
+      <div class="next-steps">
+        <strong>For Testing Locally:</strong>
+        <p>
+          Generate local certificates and run directly:
+          <br />
+          <code>npm run generate:cert && npm start</code>
+          <br />
+          Then visit <code>https://localhost:3443/challenge/certificate</code>
+        </p>
+      </div>
+
+      <p style="margin-top: 1.5rem; color: #6b7280; font-size: 0.9rem;">
+        <strong>/challenge/basic</strong> (username/password) works everywhere, including on managed platforms.
+      </p>
+    </section>
+  </body>
+</html>
+

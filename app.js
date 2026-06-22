@@ -1,70 +1,52 @@
 const express = require("express");
+const fs = require("node:fs");
+const path = require("node:path");
+const { basicAuth } = require("./middleware/basicAuth");
+const { certificateAuth } = require("./middleware/certificateAuth");
 
 const app = express();
+app.set("trust proxy", true);
+const pagesDir = path.join(__dirname, "pages");
+const certificateSuccessPagePath = path.join(pagesDir, "certificate-auth-success.html");
+const certificateSuccessPageTemplate = fs.readFileSync(certificateSuccessPagePath, "utf8");
 
-const AUTH_USER = process.env.BASIC_AUTH_USER || "admin";
-const AUTH_PASS = process.env.BASIC_AUTH_PASS || "password123";
-
-function challenge(res) {
-  res.set("WWW-Authenticate", 'Basic realm="Integrated Authentication Test"');
-  return res.status(401).send("Authentication required.");
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
-function basicAuth(req, res, next) {
-  const authHeader = req.headers.authorization;
+function renderCertificateSuccessPage(details = {}) {
+  const name = details.name || "Unknown certificate subject";
+  const capabilities = Array.isArray(details.capabilities) && details.capabilities.length > 0
+    ? details.capabilities
+    : ["Unknown capability"];
 
-  if (!authHeader || !authHeader.startsWith("Basic ")) {
-    return challenge(res);
-  }
+  const capabilityItems = capabilities
+    .map((capability) => `<li><code>${escapeHtml(capability)}</code></li>`)
+    .join("");
 
-  const encoded = authHeader.slice(6).trim();
-
-  let decoded;
-  try {
-    decoded = Buffer.from(encoded, "base64").toString("utf8");
-  } catch (error) {
-    return challenge(res);
-  }
-
-  const separatorIndex = decoded.indexOf(":");
-  if (separatorIndex === -1) {
-    return challenge(res);
-  }
-
-  const username = decoded.slice(0, separatorIndex);
-  const password = decoded.slice(separatorIndex + 1);
-
-  if (username !== AUTH_USER || password !== AUTH_PASS) {
-    return challenge(res);
-  }
-
-  return next();
+  return certificateSuccessPageTemplate
+    .replace("{{CERTIFICATE_NAME}}", escapeHtml(name))
+    .replace("{{CERTIFICATE_CAPABILITIES}}", capabilityItems);
 }
 
-app.get("/", basicAuth, (req, res) => {
-  res.type("html").send(`<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Integrated Authentication Page</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 2rem;
-        color: #1f2937;
-      }
-      h1 {
-        margin-bottom: 0.5rem;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Integrated Authentication Test</h1>
-    <p>This page is shown only when the correct username and password are provided.</p>
-  </body>
-</html>`);
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(pagesDir, "authentication-home.html"));
 });
 
-module.exports = { app };
+app.get("/challenge/basic", basicAuth, (req, res) => {
+  res.sendFile(path.join(pagesDir, "basic-auth-success.html"));
+});
+
+
+app.get("/challenge/certificate", certificateAuth, (req, res) => {
+  res.type("html").send(renderCertificateSuccessPage(req.authenticatedCertificate));
+});
+
+module.exports = { app, renderCertificateSuccessPage };
 
